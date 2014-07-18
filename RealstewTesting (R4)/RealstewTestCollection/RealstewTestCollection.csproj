@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>c188d4dc-fe30-460e-b967-608183181507</ProjectGuid>
+    <ProjectGuid>{A232DCE7-2C64-4D26-981B-370BF5D8E1AB}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>RealstewTestCollection</RootNamespace>
@@ -35,9 +35,21 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Selenium.WebDriverBackedSelenium">
+      <HintPath>..\..\..\..\..\..\Selenium\DotNet\net40\Selenium.WebDriverBackedSelenium.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="ThoughtWorks.Selenium.Core">
+      <HintPath>..\..\..\..\..\..\Selenium\DotNet\net40\ThoughtWorks.Selenium.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="WebDriver">
+      <HintPath>..\..\..\..\..\..\Selenium\DotNet\net40\WebDriver.dll</HintPath>
+    </Reference>
+    <Reference Include="WebDriver.Support">
+      <HintPath>..\..\..\..\..\..\Selenium\DotNet\net40\WebDriver.Support.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Choose>
@@ -53,8 +65,14 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="UnitTest1.cs" />
+    <Compile Include="Masterpage_Tests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RealstewTestingResources\RealstewTestingResources.csproj">
+      <Project>{8c698ae3-a424-4139-8d42-aaf0906d8628}</Project>
+      <Name>RealstewTestingResources</Name>
+    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

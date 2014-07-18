@@ -30,6 +30,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Selenium.WebDriverBackedSelenium">
+      <HintPath>..\..\..\..\..\..\Selenium\DotNet\net40\Selenium.WebDriverBackedSelenium.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -37,10 +40,21 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="ThoughtWorks.Selenium.Core">
+      <HintPath>..\..\..\..\..\..\Selenium\DotNet\net40\ThoughtWorks.Selenium.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="WebDriver">
+      <HintPath>..\..\..\..\..\..\Selenium\DotNet\net40\WebDriver.dll</HintPath>
+    </Reference>
+    <Reference Include="WebDriver.Support">
+      <HintPath>..\..\..\..\..\..\Selenium\DotNet\net40\WebDriver.Support.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
+    <Compile Include="Masterpage.cs" />
+    <Compile Include="CustomConditions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UIMap.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
