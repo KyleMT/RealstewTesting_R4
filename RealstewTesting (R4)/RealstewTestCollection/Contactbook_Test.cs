@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Text;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Selenium;
@@ -12,13 +15,17 @@ using RealstewTestingResources;
 
 namespace RealstewTestCollection
 {
+    /// <summary>
+    /// Summary description for Contactbook_Test
+    /// </summary>
     [TestClass]
-    public class Masterpage_Tests
+    public class Contactbook_Test
     {
         WebDriverWait wait;
         IWebDriver driver;
 
-        public Masterpage_Tests()
+        [TestInitialize()]
+        public void ContactbookTest_Init()
         {
             //========================
             //Select driver here
@@ -35,20 +42,20 @@ namespace RealstewTestCollection
             wait.PollingInterval = TimeSpan.FromMilliseconds(100);
         }
 
-        ~Masterpage_Tests()
+        [TestCleanup()]
+        ~Contactbook_Test()
         {
             driver.Quit();
             driver.Dispose();
         }
 
-
-
-        [TestMethod, TestCategory("Masterpage")]
-        public void LoginTest()
+        [TestMethod, TestCategory("Contactbook")]
+        public void OpenContactbook()
         {
             Masterpage.Login(driver);
-            CustomConditions.WaitForAjax(driver, 5000);
-            Assert.IsTrue(Masterpage.IsLoggedIn(driver));
+            Contactbook.OpenContactbook(driver);
+            CustomConditions.WaitForAjax(driver, 3000);
+            Assert.IsTrue(wait.Until(ExpectedConditions.ElementIsVisible(UIMap.Contactbook.ContactbookElement)) != null);
         }
     }
 }

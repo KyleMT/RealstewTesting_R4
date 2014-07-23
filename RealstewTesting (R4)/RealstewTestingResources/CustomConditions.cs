@@ -76,7 +76,7 @@ namespace RealstewTestingResources
             };
         }
 
-        public static Func<IWebDriver, IWebElement> AttributeNotEqual(By locator, string attribute, string attValue)
+        public static Func<IWebDriver, IWebElement> AttributeNotEquals(By locator, string attribute, string attValue)
         {
             return driver =>
             {
