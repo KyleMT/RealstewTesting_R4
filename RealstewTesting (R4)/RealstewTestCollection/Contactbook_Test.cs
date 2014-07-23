@@ -57,5 +57,13 @@ namespace RealstewTestCollection
             CustomConditions.WaitForAjax(driver, 3000);
             Assert.IsTrue(wait.Until(ExpectedConditions.ElementIsVisible(UIMap.Contactbook.ContactbookElement)) != null);
         }
+        [TestMethod, TestCategory("Contactbook")]
+        public void OpenLoadcontact()
+        {
+            Masterpage.Login(driver);
+            Contactbook.OpenLoadContact(driver);
+            CustomConditions.WaitForAjax(driver, 3000);
+            Assert.IsTrue(wait.Until(ExpectedConditions.ElementIsVisible(UIMap.Contactbook.LoadContact.InputField_Email)) != null);
+        }
     }
 }

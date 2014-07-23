@@ -40,7 +40,7 @@ namespace RealstewTestingResources
 
         public static bool IsLoggedIn(IWebDriver driver)
         {
-            CustomConditions.WaitForAjax(driver, 2000);
+            CustomConditions.WaitForAjax(driver, 1000);
             return (driver.FindElement(UIMap.NavigationBar.UserBar).GetAttribute("title") != "") ? true : false;
         }
 

@@ -18,12 +18,10 @@ namespace RealstewTestingResources
     {
         public static void OpenContactbook(IWebDriver driver)
         {
-            if (!Masterpage.IsLoggedIn(driver))
-            {
-                throw new Exception("User is not logged in when trying to access contact book");
-            }
-
+            if (!Masterpage.IsLoggedIn(driver)) throw new Exception("User is not logged in when trying to access contact book");
+            
             int attemptCounter = 0;
+
             WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(7));
             wait.PollingInterval = TimeSpan.FromMilliseconds(200);
             wait.IgnoreExceptionTypes(typeof(TimeoutException));
@@ -40,16 +38,21 @@ namespace RealstewTestingResources
         }
         public static void OpenLoadContact(IWebDriver driver)
         {
-            if (!Masterpage.IsLoggedIn(driver))
+            if (!Masterpage.IsLoggedIn(driver)) throw new Exception("User is not logged in when trying to access contact book");
+
+            int attemptCounter = 0;
+
+            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(7));
+            wait.PollingInterval = TimeSpan.FromMilliseconds(200);
+            wait.IgnoreExceptionTypes(typeof(TimeoutException));
+
+            do
             {
-                throw new Exception("User is not logged in when trying to access contact book");
-            }
-
-            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(5));
-            wait.PollingInterval = TimeSpan.FromMilliseconds(100);
-
-            wait.Until(CustomConditions.ElementIsClickable(UIMap.NavigationBar.Contacts)).Click();
-            wait.Until(CustomConditions.ElementIsClickable(UIMap.NavigationBar.OpenLoadContact)).Click();
+                if (attemptCounter > 3) throw new Exception("Number of attempts to open LoadContact exceeded");
+                attemptCounter++;
+                wait.Until(CustomConditions.ElementIsClickable(UIMap.NavigationBar.Contacts)).Click();
+                wait.Until(CustomConditions.ElementIsClickable(UIMap.NavigationBar.OpenLoadContact)).Click();
+            } while (!IsLoadContactOpen(driver));
         }
         public static void OpenBulkLoadContacts(IWebDriver driver)
         {
@@ -68,54 +71,18 @@ namespace RealstewTestingResources
 
         public static bool IsContactbookOpen(IWebDriver driver)
         {
-            try
-            {
-                if (!Masterpage.IsLoggedIn(driver)) return false;
-
-                WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(1));
-                wait.PollingInterval = TimeSpan.FromMilliseconds(100);
-
-                wait.Until(ExpectedConditions.ElementIsVisible(UIMap.Contactbook.ContactbookElement));
-                return true;
-            }
-            catch (WebDriverTimeoutException)
-            {
-                return false;
-            }
+            CustomConditions.WaitForAjax(driver, 1000);
+            return (driver.FindElement(UIMap.Contactbook.ContactbookElement) != null) ? true : false;
         }
         public static bool IsLoadContactOpen(IWebDriver driver)
         {
-            try
-            {
-                if (!IsContactbookOpen(driver)) return false;
-
-                WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(1));
-                wait.PollingInterval = TimeSpan.FromMilliseconds(100);
-
-                wait.Until(ExpectedConditions.ElementIsVisible(UIMap.Contactbook.LoadContact.InputField_Email));
-                return true;
-            }
-            catch (WebDriverTimeoutException)
-            {
-                return false;
-            }
+            CustomConditions.WaitForAjax(driver, 1000);
+            return (driver.FindElement(UIMap.Contactbook.LoadContact.InputField_Email) != null) ? true : false;
         }
         public static bool IsProfileOpen(IWebDriver driver)
         {
-            try
-            {
-                if (!IsContactbookOpen(driver)) return false;
-
-                WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(1));
-                wait.PollingInterval = TimeSpan.FromMilliseconds(100);
-
-                wait.Until(ExpectedConditions.ElementIsVisible(UIMap.Contactbook.Profile.InputField_FirstName));
-                return true;
-            }
-            catch (WebDriverTimeoutException)
-            {
-                return false;
-            }
+            CustomConditions.WaitForAjax(driver, 1000);
+            return (driver.FindElement(UIMap.Contactbook.Profile.InputField_FirstName) != null) ? true : false;
         }
         public static bool AreTabsDisplayed(IWebDriver driver)
         {
