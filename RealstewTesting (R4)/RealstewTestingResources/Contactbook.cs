@@ -61,12 +61,20 @@ namespace RealstewTestingResources
                 throw new Exception("User is not logged in when trying to access contact book");
             }
 
-            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(2));
-            wait.PollingInterval = TimeSpan.FromMilliseconds(100);
+            int attemptCounter = 0;
 
-            wait.Until(CustomConditions.ElementIsClickable(UIMap.NavigationBar.Contacts)).Click();
-            wait.Until(CustomConditions.ElementIsClickable(UIMap.NavigationBar.OpenBulkLoadContacts)).Click();
+            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(7));
+            wait.PollingInterval = TimeSpan.FromMilliseconds(200);
+            wait.IgnoreExceptionTypes(typeof(TimeoutException));
 
+            do
+            {
+                if (attemptCounter > 3) throw new Exception("Contactbook Cannot be opened. Possibly due to a slow connection");
+                attemptCounter++;
+                wait.Until(CustomConditions.ElementIsClickable(UIMap.NavigationBar.Contacts)).Click();
+                wait.Until(CustomConditions.ElementIsClickable(UIMap.NavigationBar.OpenBulkLoadContacts)).Click();
+                CustomConditions.WaitForAjax(driver, 5000);
+            } while (wait.Until(ExpectedConditions.ElementIsVisible(UIMap.Contactbook.ContactbookElement)) == null);
         }
 
         public static bool IsContactbookOpen(IWebDriver driver)
@@ -91,7 +99,7 @@ namespace RealstewTestingResources
                 if (!Masterpage.IsLoggedIn(driver)) return false;
 
                 WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(1));
-                wait.PollingInterval = TimeSpan.FromMilliseconds(100);
+                wait.PollingInterval = TimeSpan.FromMilliseconds(200);
 
                 wait.Until(ExpectedConditions.ElementIsVisible(UIMap.Contactbook.HorizontalTabClass));
                 return true;
@@ -108,7 +116,7 @@ namespace RealstewTestingResources
                 if (!Masterpage.IsLoggedIn(driver)) return false;
 
                 WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(1));
-                wait.PollingInterval = TimeSpan.FromMilliseconds(100);
+                wait.PollingInterval = TimeSpan.FromMilliseconds(200);
 
                 wait.Until(ExpectedConditions.ElementIsVisible(UIMap.Contactbook.Searchbar));
                 return true;
@@ -177,15 +185,22 @@ namespace RealstewTestingResources
 
             WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(5));
             wait.PollingInterval = TimeSpan.FromMilliseconds(100);
+            wait.IgnoreExceptionTypes(typeof(TimeoutException));
 
-            Navigate.Search.ByEmail(driver, existingUser.email);
-            CustomConditions.WaitForAjax(driver, 5000);
+            IWebElement container;
 
-            IWebElement container = wait.Until(ExpectedConditions.ElementIsVisible(UIMap.Contactbook.DirectoryListContainer));
+            do
+            {
+                Navigate.Search.ByEmail(driver, existingUser.email);
+                CustomConditions.WaitForAjax(driver, 5000);
 
-            IWebElement checkBox = container.FindElements(By.TagName("input"))[0];
+                container = wait.Until(ExpectedConditions.ElementIsVisible(UIMap.Contactbook.DirectoryListContainer));
+            } while (container == null);
 
-            while (!checkBox.Selected)
+            ReadOnlyCollection<IWebElement> InputList = container.FindElements(By.TagName("input"));
+            IWebElement checkBox = (InputList.Count > 0) ? InputList[0] : null;
+
+            while (checkBox != null && !checkBox.Selected)
             {
                 checkBox.Click();
             }
@@ -204,13 +219,12 @@ namespace RealstewTestingResources
             {
                 //========= Prerequisit Checking ==============
                 int tryCount = 0;
-                while (!AreTabsDisplayed(driver))
+                do
                 {
-                    if (!autoOpen || tryCount == 5) throw new Exception("Contactbook is not open and auto open is off. Cannot navigate to tab " + tab + " (Attempts: " + tryCount + ")");
+                    if (!autoOpen || tryCount > 3) throw new Exception("Contactbook is not open and auto open is off. Cannot navigate to tab " + tab + " (Attempts: " + tryCount + ")");
                     tryCount++;
                     OpenLoadContact(driver);
-                    CustomConditions.WaitForAjax(driver, 5000);
-                }
+                } while (!AreTabsDisplayed(driver)) ;
                 //============================================
 
                 // ======== SetUp ============================
@@ -271,15 +285,15 @@ namespace RealstewTestingResources
 
                 if ((int)tab[0] < 65 || (int)tab[0] > 90) throw new Exception("Invalid tab input");
 
-                while (!AreTabsDisplayed(driver))
+                do
                 {
                     if (!autoOpen || tryCount == 5) throw new Exception("Contactbook is not open and auto open is off. Cannot navigate to tab " + tab + " (Attempts: " + tryCount + ")");
                     tryCount++;
                     OpenLoadContact(driver);
-                    CustomConditions.WaitForAjax(driver, 5000);
-                }
+                } while (!AreTabsDisplayed(driver)) ;
+
                 // ======== SetUp ============================
-                WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(8));
+                WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(2));
                 wait.PollingInterval = TimeSpan.FromMilliseconds(100);
 
                 wait.Until(CustomConditions.ElementIsClickable(UIMap.Contactbook.Tab_Profile));
@@ -291,7 +305,14 @@ namespace RealstewTestingResources
                 wait.Until(CustomConditions.ElementIsClickable(By.CssSelector(cssPath))).Click();
 
                 CustomConditions.WaitForAjax(driver, 5000);
-                wait.Until(CustomConditions.TextEquals(UIMap.Contactbook.IndexPageHeader, "Index - " + tab));
+                try
+                {
+                    wait.Until(CustomConditions.TextEquals(UIMap.Contactbook.IndexPageHeader, "Index - " + tab));
+                }
+                catch (TimeoutException)
+                {
+                    throw new Exception("Failed to verify tab navigation to " + tab);
+                }
             }
             public static class Search
             {
@@ -299,15 +320,16 @@ namespace RealstewTestingResources
                 {
 
                     //========= Prerequisit Checking ==============
-                    if (lastName == null) throw new Exception("Tried to navigate to user without providing a last name");
+                    if (lastName == null) throw new Exception("Cannot search for user by name while the 'lastName' field is null");
 
                     int tryCount = 0;
-                    while (!IsContactbookOpen(driver))
+
+                    do
                     {
                         if (!autoOpen || tryCount == 3) throw new Exception("Contactbook is not open and auto open is off. Cannot navigate to user: " + lastName + " (Attempts: " + tryCount + ")");
                         tryCount++;
                         OpenContactbook(driver);
-                    }
+                    } while (!IsContactbookOpen(driver)) ;
                     //============================================
 
                     // ======== SetUp ============================
@@ -323,14 +345,14 @@ namespace RealstewTestingResources
                     //======= Function Body ======================
 
 
-                    IWebElement searchBox = wait.Until(CustomConditions.ElementIsClickable(UIMap.Contactbook.Searchbar));
+                    IWebElement searchBox = wait.Until(ExpectedConditions.ElementIsVisible(UIMap.Contactbook.Searchbar));
                     while (searchBox.GetAttribute("value") != "")
                     {
                         searchBox.Clear();
                     }
 
                     searchBox.SendKeys(lastName);
-                    CustomConditions.WaitForAjax(driver, 5000);
+                    CustomConditions.WaitForAjax(driver, 5000); //wait for auto suggest to calm down
 
                     IWebElement resultContainer = wait.Until(ExpectedConditions.ElementIsVisible(UIMap.Contactbook.DirectoryListContainer));
 
@@ -355,10 +377,10 @@ namespace RealstewTestingResources
                     WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(3));
                     wait.PollingInterval = TimeSpan.FromMilliseconds(100);
 
-                    while (!IsContactbookOpen(driver) || !IsSearchbarDisplayed(driver))
+                    while (!IsSearchbarDisplayed(driver))
                     {
                         if (!autoOpen) throw new Exception("Contactbook is not open and auto open is off. Cannot navigate to user: " + email + ")");
-                        Navigate.ToLetter(driver, "A");
+                        Navigate.ToLetter(driver, "A", true);
                     }
                     //============================================
                     //======= Function Body ======================
@@ -390,15 +412,16 @@ namespace RealstewTestingResources
         }
         public class UserInfo
         {
-            //For drop down menus, we use the index of the value rather than the text. The reson for this is that it makes it much easier to write a recursive test with different values
+            //For drop down menus, we use the index of the value rather than the text.
+            //The reson for this is that it makes it much easier to write a recursive test with different values
             public string email = null;
             public string firstName = null;
             public string surname = null;
             public string businessName = null;
             public string contactPerson = null;
 
-            public int category = 0; //Select index of value desired. 'Select category' is 0, 'Accomodation' is 1...
-            public int subCategory = 0; //Same as category
+            public int category = 0; //Select index of value desired. 'Select category' is 0, 'Accomodation' is 1... Same for all drop down menu items
+            public int subCategory = 0; 
             public int country = 0;
             public int province = 0;
             public int city = 0;
@@ -445,7 +468,6 @@ namespace RealstewTestingResources
                 List<int> resultList = new List<int>{category,subCategory,country,province,city,
                                                        suburb,DOB_Year, DOB_Month, DOB_Year, gender};
                 return resultList;
-
             }
         }
     }
