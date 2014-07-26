@@ -31,15 +31,15 @@ namespace RealstewTestingResources
                 {
                     IJavaScriptExecutor jsDriver = (IJavaScriptExecutor)driver;
 
-                    for (int i = 0; i <= (timeOut / 100); i++)
+                    for (int i = 0; i <= (timeOut / 100); i++) //Approx 50ms to exceute script. 50 to sleep
                     {
-                        if ((bool)jsDriver.ExecuteScript("return jQuery.active == 0"))
+                        if ((bool)jsDriver.ExecuteScript("return jQuery.active == 0")) 
                         {
                             //Console.WriteLine("Ajax done");
                             return;
                         }
                         //Console.WriteLine("Ajax not done : " + (timeOut - (i * 100)) + " ms left");
-                        Thread.Sleep(100);
+                        Thread.Sleep(50);
                     }
                 }
                 else

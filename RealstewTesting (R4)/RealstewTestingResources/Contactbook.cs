@@ -22,7 +22,7 @@ namespace RealstewTestingResources
             
             int attemptCounter = 0;
 
-            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(7));
+            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(5));
             wait.PollingInterval = TimeSpan.FromMilliseconds(200);
             wait.IgnoreExceptionTypes(typeof(TimeoutException));
 
@@ -30,9 +30,9 @@ namespace RealstewTestingResources
             {
                 if (attemptCounter > 3) throw new Exception("Contactbook Cannot be opened. Possibly due to a slow connection");
                 attemptCounter++;
-                wait.Until(CustomConditions.ElementIsClickable(UIMap.NavigationBar.Contacts)).Click();
-                wait.Until(CustomConditions.ElementIsClickable(UIMap.NavigationBar.OpenContactbook)).Click();
-                CustomConditions.WaitForAjax(driver, 5000);
+                wait.Until(ExpectedConditions.ElementIsVisible(UIMap.NavigationBar.Contacts)).Click();
+                wait.Until(ExpectedConditions.ElementIsVisible(UIMap.NavigationBar.OpenContactbook)).Click();
+                CustomConditions.WaitForAjax(driver, 2000);
             } while (wait.Until(ExpectedConditions.ElementIsVisible(UIMap.Contactbook.ContactbookElement)) == null);
 
         }
@@ -50,8 +50,8 @@ namespace RealstewTestingResources
             {
                 if (attemptCounter > 3) throw new Exception("Number of attempts to open LoadContact exceeded");
                 attemptCounter++;
-                wait.Until(CustomConditions.ElementIsClickable(UIMap.NavigationBar.Contacts)).Click();
-                wait.Until(CustomConditions.ElementIsClickable(UIMap.NavigationBar.OpenLoadContact)).Click();
+                wait.Until(ExpectedConditions.ElementIsVisible(UIMap.NavigationBar.Contacts)).Click();
+                wait.Until(ExpectedConditions.ElementIsVisible(UIMap.NavigationBar.OpenLoadContact)).Click();
             } while (!IsLoadContactOpen(driver));
         }
         public static void OpenBulkLoadContacts(IWebDriver driver)
@@ -79,32 +79,52 @@ namespace RealstewTestingResources
 
         public static bool IsContactbookOpen(IWebDriver driver)
         {
-            CustomConditions.WaitForAjax(driver, 1000);
-            return (driver.FindElement(UIMap.Contactbook.ContactbookElement) != null) ? true : false;
+            try
+            {
+                CustomConditions.WaitForAjax(driver, 1000);
+                driver.FindElement(UIMap.Contactbook.ContactbookElement);
+                return true;
+            }
+            catch (NoSuchElementException)
+            {
+                return false;
+            }
         }
         public static bool IsLoadContactOpen(IWebDriver driver)
         {
-            CustomConditions.WaitForAjax(driver, 1000);
-            return (driver.FindElement(UIMap.Contactbook.LoadContact.InputField_Email) != null) ? true : false;
+            try
+            {
+                CustomConditions.WaitForAjax(driver, 1000);
+                driver.FindElement(UIMap.Contactbook.LoadContact.InputField_Email);
+                return true;
+            }
+            catch (NoSuchElementException)
+            {
+                return false;
+            }
+
         }
         public static bool IsProfileOpen(IWebDriver driver)
         {
-            CustomConditions.WaitForAjax(driver, 1000);
-            return (driver.FindElement(UIMap.Contactbook.Profile.InputField_FirstName) != null) ? true : false;
+            try
+            {
+                CustomConditions.WaitForAjax(driver, 1000);
+                driver.FindElement(UIMap.Contactbook.Profile.InputField_FirstName);
+                return true;
+            }
+            catch (NoSuchElementException){
+                return false;
+            }
         }
         public static bool AreTabsDisplayed(IWebDriver driver)
         {
             try
             {
-                if (!Masterpage.IsLoggedIn(driver)) return false;
-
-                WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(1));
-                wait.PollingInterval = TimeSpan.FromMilliseconds(200);
-
-                wait.Until(ExpectedConditions.ElementIsVisible(UIMap.Contactbook.HorizontalTabClass));
+                CustomConditions.WaitForAjax(driver, 3000);
+                driver.FindElement(UIMap.Contactbook.HorizontalTabClass);
                 return true;
             }
-            catch (WebDriverTimeoutException)
+            catch (NoSuchElementException)
             {
                 return false;
             }
@@ -219,12 +239,12 @@ namespace RealstewTestingResources
             {
                 //========= Prerequisit Checking ==============
                 int tryCount = 0;
-                do
+                while (!AreTabsDisplayed(driver))
                 {
                     if (!autoOpen || tryCount > 3) throw new Exception("Contactbook is not open and auto open is off. Cannot navigate to tab " + tab + " (Attempts: " + tryCount + ")");
                     tryCount++;
                     OpenLoadContact(driver);
-                } while (!AreTabsDisplayed(driver)) ;
+                } 
                 //============================================
 
                 // ======== SetUp ============================
@@ -285,18 +305,16 @@ namespace RealstewTestingResources
 
                 if ((int)tab[0] < 65 || (int)tab[0] > 90) throw new Exception("Invalid tab input");
 
-                do
+                while (!AreTabsDisplayed(driver))
                 {
                     if (!autoOpen || tryCount == 5) throw new Exception("Contactbook is not open and auto open is off. Cannot navigate to tab " + tab + " (Attempts: " + tryCount + ")");
                     tryCount++;
                     OpenLoadContact(driver);
-                } while (!AreTabsDisplayed(driver)) ;
+                }
 
                 // ======== SetUp ============================
                 WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(2));
                 wait.PollingInterval = TimeSpan.FromMilliseconds(100);
-
-                wait.Until(CustomConditions.ElementIsClickable(UIMap.Contactbook.Tab_Profile));
                 //============================================
 
                 //======= Function Body =====================
@@ -304,7 +322,7 @@ namespace RealstewTestingResources
 
                 wait.Until(CustomConditions.ElementIsClickable(By.CssSelector(cssPath))).Click();
 
-                CustomConditions.WaitForAjax(driver, 5000);
+                CustomConditions.WaitForAjax(driver, 2000);
                 try
                 {
                     wait.Until(CustomConditions.TextEquals(UIMap.Contactbook.IndexPageHeader, "Index - " + tab));
@@ -324,12 +342,12 @@ namespace RealstewTestingResources
 
                     int tryCount = 0;
 
-                    do
+                    while (!IsContactbookOpen(driver)) 
                     {
                         if (!autoOpen || tryCount == 3) throw new Exception("Contactbook is not open and auto open is off. Cannot navigate to user: " + lastName + " (Attempts: " + tryCount + ")");
                         tryCount++;
                         OpenContactbook(driver);
-                    } while (!IsContactbookOpen(driver)) ;
+                    } 
                     //============================================
 
                     // ======== SetUp ============================
@@ -377,10 +395,12 @@ namespace RealstewTestingResources
                     WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(3));
                     wait.PollingInterval = TimeSpan.FromMilliseconds(100);
 
+                    int tryCount = 0;
                     while (!IsSearchbarDisplayed(driver))
                     {
-                        if (!autoOpen) throw new Exception("Contactbook is not open and auto open is off. Cannot navigate to user: " + email + ")");
+                        if (!autoOpen || tryCount == 3) throw new Exception("Contactbook search bar is not displayed and max number of attempts excceded (Attempts: " + tryCount + ")");
                         Navigate.ToLetter(driver, "A", true);
+                        tryCount++;
                     }
                     //============================================
                     //======= Function Body ======================
