@@ -42,11 +42,11 @@ namespace RealstewTestCollection
             wait = new WebDriverWait(driver, TimeSpan.FromSeconds(7));
             wait.PollingInterval = TimeSpan.FromMilliseconds(100);
         }
-
         [TestCleanup()]
         ~Contactbook_Test()
         {
             driver.Quit();
+            driver.Dispose();
         }
 
         [TestMethod, TestCategory("Contactbook")]
@@ -127,7 +127,6 @@ namespace RealstewTestCollection
 
             Contactbook.LoadUser(driver, newUser);
         }
-
         [TestMethod, TestCategory("Contactbook")]
         public void RemoverContact()
         {
@@ -152,7 +151,6 @@ namespace RealstewTestCollection
                 Assert.IsTrue(e.Message == "No results found");
             }
         }
-
         [TestMethod, TestCategory("InputValidation")]
         public void InputFields_LoadContact()
         {
@@ -207,9 +205,6 @@ namespace RealstewTestCollection
 
             Assert.IsTrue(failedElementsList.Count == 0);
         }
-
-
-
         [TestMethod, TestCategory("Contactbook")]
         public void DocumentTab()
         {
@@ -220,9 +215,6 @@ namespace RealstewTestCollection
             wait.Until(CustomConditions.ElementIsClickable(By.Id("tbFirstName")));
             Contactbook.Navigate.ToTab(driver, "Documents");
         }
-
-        
-
         [TestMethod, TestCategory("Contactbook")]
         public void Navigation_ToLetter()
         {
@@ -237,10 +229,5 @@ namespace RealstewTestCollection
             }
 
         }
-
-
-
-
-
     }
 }

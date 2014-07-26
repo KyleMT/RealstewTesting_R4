@@ -63,6 +63,9 @@ namespace RealstewTestingResources
 
             public static By ContactbookElement = By.Id("pageerr");
 
+            public static By ContactbookClose = By.CssSelector("#pageerr > table > tbody > tr > td:nth-child(1) > div:nth-child(1) > div:nth-child(2)");
+
+            public static By LoadContactButton = By.CssSelector("#crmBook > div > div:nth-child(1) > div:nth-child(1) > div");
             public static class LoadContact
             {
                 public static By TextInputClass = By.ClassName("crmField");
@@ -77,6 +80,12 @@ namespace RealstewTestingResources
                 public static By Alert_UpdateSuccessfull = By.Id("cBookDetailsAlert");
 
             }
+
+            public static class BulkLoadContact
+            {
+                public static By ImportOptionDropDown = By.Id("dlimportType");
+            }
+            
             public static class News
             {
                 public static By PageHeader = By.CssSelector("#crmBook > div.crmNewsletter > div > div:nth-child(1)");
@@ -86,6 +95,8 @@ namespace RealstewTestingResources
                 public static By InputField_FirstName = By.Id("firstname");
 
             }
+        
+        
         }
     }
 }
