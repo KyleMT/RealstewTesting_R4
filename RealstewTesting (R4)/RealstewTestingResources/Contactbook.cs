@@ -31,7 +31,7 @@ namespace RealstewTestingResources
                 if (attemptCounter > 3) throw new Exception("Contactbook Cannot be opened. Possibly due to a slow connection");
                 attemptCounter++;
                 wait.Until(ExpectedConditions.ElementIsVisible(UIMap.NavigationBar.Contacts)).Click();
-                wait.Until(ExpectedConditions.ElementIsVisible(UIMap.NavigationBar.OpenContactbook)).Click();
+                wait.Until(ExpectedConditions.ElementIsVisible(UIMap.NavigationBar.ContactsMenu.OpenContactbook)).Click();
                 CustomConditions.WaitForAjax(driver, 2000);
             } while (wait.Until(ExpectedConditions.ElementIsVisible(UIMap.Contactbook.ContactbookElement)) == null);
 
@@ -51,7 +51,7 @@ namespace RealstewTestingResources
                 if (attemptCounter > 3) throw new Exception("Number of attempts to open LoadContact exceeded");
                 attemptCounter++;
                 wait.Until(ExpectedConditions.ElementIsVisible(UIMap.NavigationBar.Contacts)).Click();
-                wait.Until(ExpectedConditions.ElementIsVisible(UIMap.NavigationBar.OpenLoadContact)).Click();
+                wait.Until(ExpectedConditions.ElementIsVisible(UIMap.NavigationBar.ContactsMenu.OpenLoadContact)).Click();
             } while (!IsLoadContactOpen(driver));
         }
         public static void OpenBulkLoadContacts(IWebDriver driver)
@@ -72,11 +72,10 @@ namespace RealstewTestingResources
                 if (attemptCounter > 3) throw new Exception("Contactbook Cannot be opened. Possibly due to a slow connection");
                 attemptCounter++;
                 wait.Until(CustomConditions.ElementIsClickable(UIMap.NavigationBar.Contacts)).Click();
-                wait.Until(CustomConditions.ElementIsClickable(UIMap.NavigationBar.OpenBulkLoadContacts)).Click();
+                wait.Until(CustomConditions.ElementIsClickable(UIMap.NavigationBar.ContactsMenu.OpenBulkLoadContacts)).Click();
                 CustomConditions.WaitForAjax(driver, 5000);
             } while (wait.Until(ExpectedConditions.ElementIsVisible(UIMap.Contactbook.ContactbookElement)) == null);
         }
-
         public static bool IsContactbookOpen(IWebDriver driver)
         {
             try
@@ -146,7 +145,6 @@ namespace RealstewTestingResources
                 return false;
             }
         }
-
         public static void LoadUser(IWebDriver driver, UserInfo newUser)
         {
             OpenLoadContact(driver);
@@ -198,7 +196,6 @@ namespace RealstewTestingResources
                 throw new Exception("Could not verify if details were added properly");
             }
         }
-
         public static void RemoveContact(IWebDriver driver, UserInfo existingUser)
         {
             if (existingUser.email == null) throw new Exception("Cannot remove user without email. The email is a unique identifier");
@@ -232,7 +229,6 @@ namespace RealstewTestingResources
                 throw new Exception("Cannot verify user deletion");
             }
         }
-
         public static class Navigate
         {
             public static void ToTab(IWebDriver driver, string tab, bool autoOpen = true)
@@ -257,8 +253,6 @@ namespace RealstewTestingResources
 
                 //======= Function Body =====================
 
-                ReadOnlyCollection<IWebElement> tabList;
-                IWebElement result = null;
                 By locator;
 
                 switch (tab)

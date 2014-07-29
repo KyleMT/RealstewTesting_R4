@@ -25,6 +25,7 @@ namespace RealstewTestingResources
                 int attemptCounter = 0;
 
                 IWebElement userBar = wait.Until(ExpectedConditions.ElementIsVisible(UIMap.NavigationBar.UserBar));
+                if (userBar == null) throw new Exception("Userbar not found");
                 do
                 {
                     if (attemptCounter > 3) throw new Exception("Max loggin attempts reached");
@@ -41,11 +42,15 @@ namespace RealstewTestingResources
         public static bool IsLoggedIn(IWebDriver driver)
         {
             CustomConditions.WaitForAjax(driver, 1000);
-            return (driver.FindElement(UIMap.NavigationBar.UserBar).GetAttribute("title") != "") ? true : false;
+
+            try
+            {
+                IWebElement userBar = driver.FindElement(UIMap.NavigationBar.UserBar);
+                return (userBar.GetAttribute("title") != "") ? true : false;
+            }
+            catch (TimeoutException){
+                throw new Exception("Cannot find userBar element, failed to login");
+            }
         }
-
-
-
-
     }
 }
