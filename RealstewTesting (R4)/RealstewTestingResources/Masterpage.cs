@@ -15,7 +15,7 @@ namespace RealstewTestingResources
 {
     public static class Masterpage
     {
-        public static void Login(IWebDriver driver, string userName = "kyle.mark.taylor17@gmail.com", string password = "gnomer1552")
+        public static void Login(IWebDriver driver, string userName = "rshq.test@gmail.com", string password = "201401")
         {
             if (!IsLoggedIn(driver))
             {
