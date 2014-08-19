@@ -86,31 +86,21 @@ namespace RealstewTestCollection
             Masterpage.Login(driver);
             Contactbook.OpenContactbook(driver);
 
-            ReadOnlyCollection<IWebElement> resultList = Contactbook.Navigate.Search.ByName(driver, user);
-
-            bool userFound = false;
-            foreach (IWebElement em in resultList)
-            {
-                if (em.FindElement(By.TagName("div")).Text.Contains(user))
-                {
-                    userFound = true; 
-                    break;
-                };                
-            }
-           
-            Assert.IsTrue(userFound);
+            IWebElement resultList = Contactbook.Navigate.Search.ByName(driver, user);
+            
+            Assert.IsTrue(resultList.FindElements(By.TagName("td"))[1].Text.Contains(user));
         }
         [TestMethod, TestCategory("Contactbook")]
         public void NavigationTest_ToUser_Email()
         {
-            string email = "clive.taylor@xtra.co.nz";
+            string email = "test@test.com";
 
             Masterpage.Login(driver);
             Contactbook.OpenContactbook(driver);
 
-            Contactbook.Navigate.Search.ByEmail(driver, email);
+            IWebElement result = Contactbook.Navigate.Search.ByEmail(driver, email);
 
-            Assert.IsTrue(driver.FindElement((By.CssSelector("#crmDirectoryList > div:nth-child(1) > div > table > tbody > tr > td:nth-child(3)"))).Text.Contains(email));
+            Assert.IsTrue(result.FindElements(By.TagName("td"))[2].Text.Contains(email));
         }
         [TestMethod, TestCategory("Contactbook")]
         public void LoadContact()
@@ -209,10 +199,9 @@ namespace RealstewTestCollection
         public void DocumentTab()
         {
             Masterpage.Login(driver);
-            Contactbook.Navigate.Search.ByEmail(driver, "clive.taylor@xtra.co.nz");
+            IWebElement searchResult = Contactbook.Navigate.Search.ByEmail(driver, "test@test.com");
             CustomConditions.WaitForAjax(driver, 5000);
-            wait.Until(CustomConditions.ElementIsClickable(By.CssSelector("#crmDirectoryList > div:nth-child(1) > div > table > tbody > tr > td:nth-child(2) > div"))).Click();
-            wait.Until(CustomConditions.ElementIsClickable(By.Id("tbFirstName")));
+            searchResult.FindElements(By.TagName("td"))[1].Click();
             Contactbook.Navigate.ToTab(driver, "Documents");
         }
         [TestMethod, TestCategory("Contactbook")]

@@ -54,7 +54,7 @@ namespace RealstewTestCollection
         {
             Masterpage.Login(driver);
             CustomConditions.WaitForAjax(driver, 1000);
-            wait.IgnoreExceptionTypes(typeof(TimeoutException));
+            wait.IgnoreExceptionTypes(typeof(WebDriverTimeoutException));
 
             driver.FindElement(UIMap.NavigationBar.Contacts).Click();
             wait.Until(ExpectedConditions.ElementIsVisible(UIMap.NavigationBar.ContactsMenu.OpenContactbook)).Click();
@@ -124,8 +124,8 @@ namespace RealstewTestCollection
             if (driver.FindElement(By.Id("usergrouplist")).FindElements(By.TagName("div")).Count > 0)
             {
                 IWebElement subMenuItem = driver.FindElement(By.Id("usergrouplist")).FindElements(By.TagName("div"))[1];
-                subMenuItem = subMenuItem.FindElements(By.TagName("div"))[1];
-                subMenuItem = subMenuItem.FindElement(By.TagName("div"));
+                subMenuItem = subMenuItem.FindElements(By.TagName("div"))[0];
+                subMenuItem = subMenuItem.FindElement(By.TagName("a"));
                 if (subMenuItem != null)
                 {
                     subMenuItem.Click();
@@ -245,7 +245,7 @@ namespace RealstewTestCollection
 
             wait.Until(ExpectedConditions.ElementIsVisible(UIMap.NavigationBar.UserControlMenu.MoneyManagement)).Click();
             Assert.IsTrue(wait.Until(ExpectedConditions.ElementIsVisible(UIMap.NavigationBar.UserControlMenu.MoneyManagementMenu.RealFinancial)) != null);
-              wait.Until(ExpectedConditions.ElementIsVisible(UIMap.NavigationBar.UserControlMenu.MoneyManagementMenu.RealFinancial)).Click();
+             wait.Until(ExpectedConditions.ElementIsVisible(UIMap.NavigationBar.UserControlMenu.MoneyManagementMenu.RealFinancial)).Click();
             Assert.IsTrue(wait.Until(ExpectedConditions.ElementIsVisible(UIMap.RealFinacial.CoinIcon)) != null);
 
             CustomConditions.WaitForAjax(driver, 2000);

@@ -24,7 +24,7 @@ namespace RealstewTestingResources
 
             WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(5));
             wait.PollingInterval = TimeSpan.FromMilliseconds(200);
-            wait.IgnoreExceptionTypes(typeof(TimeoutException));
+            wait.IgnoreExceptionTypes(typeof(WebDriverTimeoutException));
 
             do
             {
@@ -44,7 +44,7 @@ namespace RealstewTestingResources
 
             WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(7));
             wait.PollingInterval = TimeSpan.FromMilliseconds(200);
-            wait.IgnoreExceptionTypes(typeof(TimeoutException));
+            wait.IgnoreExceptionTypes(typeof(WebDriverTimeoutException));
 
             do
             {
@@ -65,7 +65,7 @@ namespace RealstewTestingResources
 
             WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(7));
             wait.PollingInterval = TimeSpan.FromMilliseconds(200);
-            wait.IgnoreExceptionTypes(typeof(TimeoutException));
+            wait.IgnoreExceptionTypes(typeof(WebDriverTimeoutException));
 
             do
             {
@@ -202,7 +202,7 @@ namespace RealstewTestingResources
 
             WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(5));
             wait.PollingInterval = TimeSpan.FromMilliseconds(100);
-            wait.IgnoreExceptionTypes(typeof(TimeoutException));
+            wait.IgnoreExceptionTypes(typeof(WebDriverTimeoutException));
 
             IWebElement container;
 
@@ -242,7 +242,7 @@ namespace RealstewTestingResources
                     OpenLoadContact(driver);
                 } 
                 //============================================
-
+                
                 // ======== SetUp ============================
                 WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(8));
                 wait.PollingInterval = TimeSpan.FromMilliseconds(100);
@@ -321,14 +321,14 @@ namespace RealstewTestingResources
                 {
                     wait.Until(CustomConditions.TextEquals(UIMap.Contactbook.IndexPageHeader, "Index - " + tab));
                 }
-                catch (TimeoutException)
+                catch (WebDriverTimeoutException)
                 {
                     throw new Exception("Failed to verify tab navigation to " + tab);
                 }
             }
             public static class Search
             {
-                public static ReadOnlyCollection<IWebElement> ByName(IWebDriver driver, string lastName, bool autoOpen = true)
+                public static IWebElement ByName(IWebDriver driver, string lastName, bool autoOpen = true)
                 {
 
                     //========= Prerequisit Checking ==============
@@ -370,17 +370,28 @@ namespace RealstewTestingResources
 
                     if (resultContainer.Text != "no contacts found.")
                     {
-                        ReadOnlyCollection<IWebElement> resultList = resultContainer.FindElement(By.TagName("div")).FindElements(By.TagName("div"));
-                        if (!resultList[0].FindElement(By.TagName("div")).Text.Contains(lastName))
+                        bool foundResult = false;
+                        ReadOnlyCollection<IWebElement> resultList = resultContainer.FindElements(By.TagName("tr"));
+
+                        foreach (IWebElement row in resultList)
                         {
-                            throw new Exception("Failed to verify ToUser navigation");
+                            ReadOnlyCollection<IWebElement> columnList = row.FindElements(By.TagName("td"));
+                            foundResult = columnList[1].Text.Contains(lastName);
+                            if (foundResult) return row;
                         }
 
-                        return resultList;
+                        throw new Exception("Failed to verify ToUser navigation");
+                        //ReadOnlyCollection<IWebElement> resultList = resultContainer.FindElement(By.TagName("div")).FindElements(By.TagName("div"));
+                        //if (!resultList[0].FindElement(By.TagName("div")).Text.Contains(lastName))
+                        //{
+                        //    throw new Exception("Failed to verify ToUser navigation");
+                        //}
+
+                        //return resultList;
                     }
-                    else throw new Exception("No results found");
+                    else throw new Exception("Name search produced no results");
                 }
-                public static void ByEmail(IWebDriver driver, string email, bool autoOpen = true)
+                public static IWebElement ByEmail(IWebDriver driver, string email, bool autoOpen = true)
                 {
 
                     //========= Prerequisit Checking ==============
@@ -407,6 +418,7 @@ namespace RealstewTestingResources
                     }
 
                     searchBox.SendKeys(email);
+                    searchBox.SendKeys("   ");
 
                     CustomConditions.WaitForAjax(driver, 5000);
 
@@ -414,13 +426,27 @@ namespace RealstewTestingResources
 
                     if (resultContainer.Text != "no contacts found.")
                     {
-                        IWebElement firstResult = wait.Until(CustomConditions.ElementIsClickable(By.CssSelector("#crmDirectoryList > div:nth-child(1) > div > table > tbody > tr > td:nth-child(3)")));
+                        bool foundResult = false;
+                        ReadOnlyCollection<IWebElement> resultList = resultContainer.FindElements(By.TagName("tr"));
 
-                        if (!firstResult.Text.Contains(email))
+                        foreach (IWebElement row in resultList)
                         {
-                            throw new Exception("Failed to verify ToUser navigation");
+                            ReadOnlyCollection<IWebElement> columnList = row.FindElements(By.TagName("td"));
+                            foundResult = columnList[2].Text.Contains(email);
+                            if (foundResult) return row;
                         }
+
+                        throw new Exception("Failed to verify ToUser navigation");
+
+                        //IWebElement firstResult = wait.Until(CustomConditions.ElementIsClickable(By.CssSelector("#crmDirectoryList > div:nth-child(1) > div > table > tbody > tr > td:nth-child(3)")));
+
+                        //if (!firstResult.Text.Contains(email))
+                        //{
+                        //    throw new Exception("Failed to verify ToUser navigation");
+                        //}
                     }
+
+                    throw new Exception("Email search returned no results");
                 }
             }
         }
