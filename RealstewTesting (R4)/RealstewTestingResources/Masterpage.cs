@@ -21,14 +21,14 @@ namespace RealstewTestingResources
             {
                 WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(1));
                 wait.PollingInterval = TimeSpan.FromMilliseconds(200);
-                wait.IgnoreExceptionTypes(typeof(TimeoutException));
+                wait.IgnoreExceptionTypes(typeof(WebDriverTimeoutException));
                 int attemptCounter = 0;
 
                 IWebElement userBar = wait.Until(ExpectedConditions.ElementIsVisible(UIMap.NavigationBar.UserBar));
                 if (userBar == null) throw new Exception("Userbar not found");
                 do
                 {
-                    if (attemptCounter > 3) throw new Exception("Max loggin attempts reached");
+                    if (attemptCounter > 3) throw new Exception("Max login attempts reached");
                     attemptCounter++;
                     userBar.Click();
                 } while (wait.Until(ExpectedConditions.ElementIsVisible(UIMap.LoginForm.LoginBody)) == null);
@@ -48,7 +48,8 @@ namespace RealstewTestingResources
                 IWebElement userBar = driver.FindElement(UIMap.NavigationBar.UserBar);
                 return (userBar.GetAttribute("title") != "") ? true : false;
             }
-            catch (TimeoutException){
+            catch (WebDriverTimeoutException)
+            {
                 throw new Exception("Cannot find userBar element, failed to login");
             }
         }

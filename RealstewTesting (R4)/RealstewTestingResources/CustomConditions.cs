@@ -41,6 +41,7 @@ namespace RealstewTestingResources
                         //Console.WriteLine("Ajax not done : " + (timeOut - (i * 100)) + " ms left");
                         Thread.Sleep(50);
                     }
+                    Console.WriteLine("WaitForAjax timeout, hoping for the best...");
                 }
                 else
                 {
